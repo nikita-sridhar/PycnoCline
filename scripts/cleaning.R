@@ -1,5 +1,4 @@
 library(tidyverse)
-library(lubridate)
 
 behavior <- read.csv("data/raw data/ 2023_Pycnocline_RawData - Behavior_8_17_23.csv")
 processed_kelp <- read.csv("data/processed data/processed_kelp.csv") 
