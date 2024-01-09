@@ -13,14 +13,15 @@ behavior <- read_csv("data/raw data/RawData - Behavior.csv")
 
 #on per time pt scale
 pyc_position <- behavior %>%
-  select(Date, Day_numrecord,Time,Trial,Treatment, Treatment_ID, Cline, Pyc_position) %>%
+  select(Date, Day_numrecord, Time, Trial, Treatment, Cline, Pyc_position) %>%
   group_by(Trial, Treatment, Day_numrecord) %>%
-  mutate(#If active treatment, if 1 for pyc position, change it to cline num. 
-         #if 0, change to cline num where it IS 1. if not active, leave the same
-         Pyc_position = ifelse(Treatment == "Active", ifelse(Pyc_position == 1, Cline, Pyc_), Pyc_position), 
-         #for caged/control treatments, change pyc position to 5.5 for all. if 
-         #not caged/control, leave same
-         Pyc_position = ifelse(Treatment %in% c("Caged", "Control"),5.5,Pyc_position)) 
+  mutate(#If active treatment, pyc position is equal to the value of the cline 
+         #where the corresponding pycno position is 1. index cline value where 
+         #pyc position equal to 1. If not active, change to 5.5
+         Pyc_position = ifelse(Treatment == "Active", 
+                               (Pyc_position = Cline[Pyc_position == 1]), 5.5)) %>%
+  na.omit()
+
 #on per trial scale
 avg_pyc_position <- pyc_position %>%
   group_by(Trial, Treatment) %>%
@@ -29,9 +30,8 @@ avg_pyc_position <- pyc_position %>%
   mutate(avg_pyc_position = ifelse(Treatment %in% c("Caged", "Control"),5.5, avg_pyc_position))
 
 #scratch to be added to line 20
-#pyc position for all active is equal to the value of that cline where the corresponding pycno position is 1
-#index cline by pyc position equal to 1
-Pyc_position = cline[pyc_position == 1]
+
+Pyc_position = Cline[Pyc_position == 1]
 
 
 ###############################
