@@ -27,6 +27,12 @@ anova(mod_1a)
 parameters::p_value(mod_1a)
 
 
+#######################################################
+#Model 1b: Kelp Grazed in Active vs. Control treatments
+#######################################################
+
+
+
 
 
 
