@@ -1,7 +1,8 @@
 library(tidyverse)
 library(readxl)
 
-#quick plot for tnc report - using a lsmeans table outputted from jmp
+#old stuff based on JMP output. TO DO: Need to update using variables in R env from analysis pipeline.
+#quick plot for tnc report - using a lsmeans table outputted from jmp 
 treatment_updn <- read_excel("data/processed data/jmp_lsmeans_treatment_updown.xlsx") %>%
   rename("least_sq_mean" = "Least Sq Mean",
          "up_dn" = "Upstream/Downstream",
