@@ -51,11 +51,11 @@ parameters::p_value(mod_1b)
 
 
 #######################################################
-#Model 1c: Kelp Grazed across all treatments
+#Model 1c: Kelp Grazed across all treatments - main
 #######################################################
 #most informative model
 
-mod_1c <- lmer(sqrt(abs(weight_pcnt_change)) ~ 
+mod_1c <- lmer((weight_pcnt_change) ~ 
                  
                  #Fixed effects
                  Treatment + up_down + avg_dist_from_pyc + up_down_ratio +
@@ -75,5 +75,7 @@ parameters::p_value(mod_1c)
 #sqrt of negative num, and sometimes value was negative so need to think abt that
 #also, taking sqrt of abs not solution bc if neg means increase in kelp mass. 
 #figure out what you did for this in JMP - maybe remove these values?
+
+
 
 #TO DO: calculate lsmeans and St error to use for plots.
