@@ -95,7 +95,10 @@ kelp <- kelp_clean %>%
   #up_down ratio calculation
   group_by(Trial, Treatment, Rep_per_trial) %>%
   mutate(up_down_ratio = sum(up_down=="Up")/sum(up_down=="Down")) %>%
-  ungroup() #%>%
+  ungroup() %>%
+#making trial and rep_per_trial character
+  mutate(across(c(Trial, Rep_per_trial), as.character))
+
 #can add urchin roster info if you want:
 #left_join(urch_size,by = c("Trial","Tank")) %>%
 
