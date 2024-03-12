@@ -128,3 +128,5 @@ urch_behavior <- behavior_clean %>%
 
 
 #TO DO: investigate why kelp variable doesn't have
+#i think there's some prob in manipualtion -- bc no trial 10 in manipulated kelp. and model results
+#are v difff to JMP - nothin significant now -- need to investigate
