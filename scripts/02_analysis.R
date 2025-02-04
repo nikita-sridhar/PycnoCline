@@ -11,6 +11,7 @@
 # Model 1a: Kelp Grazed in Caged vs. Control treatments
 #######################################################
 
+kelp_cage_control <- kelp %>% filter(Treatment == "Caged" | Treatment == "Control")
 
 mod_1a <- lmer(sqrt(abs(weight_pcnt_change)) ~ 
                  
@@ -23,8 +24,7 @@ mod_1a <- lmer(sqrt(abs(weight_pcnt_change)) ~
                  (1| Trial) + (1 | Rep_per_trial),
                  
                  #Data filter: caged and control treatments
-                 data = kelp %>% 
-                 filter(Treatment == "Caged" | Treatment == "Control"))
+                 data = kelp_cage_control)
 
 anova(mod_1a)
 parameters::p_value(mod_1a)

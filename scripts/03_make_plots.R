@@ -10,6 +10,13 @@ treatment_updn <- read_excel("data/processed data/jmp_lsmeans_treatment_updown.x
 kelp <- read_csv("data/processed data/processed_kelp_v2.csv") %>%
   rename("distance" = "Distance.from.pyc")
 
+#overall grazing (not separated by up/down) - double check least sq mean u are using vs. raw data or something else
+ggplot(data = treatment_updn, aes(x = Treatment, y = least_sq_mean) ) +
+  geom_boxplot() +
+  theme_classic() +
+  ylab("% Change Kelp Grazed") +
+  labs(fill = "Upstream/Downstream")
+
 #grazing by treatment and region
 ggplot(data = treatment_updn, aes(x = Treatment, y = least_sq_mean, 
                                   fill = up_dn) ) +

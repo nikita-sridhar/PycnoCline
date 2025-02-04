@@ -17,8 +17,8 @@ source(here::here("./scripts/02_analysis.R"))
 #write.csv(kelp_clean, file = "data/processed data/cleaned data/kelp_clean.csv")
 #write.csv(behavior_clean, file = "data/processed data/cleaned data/behavior_clean.csv")
 
-#write.csv(kelp, file = "data/processed data/manipulated data/kelp.csv")
-#write.csv(urch_behavior, file = "data/processed data/manipulated data/urch_behavior.csv")
+write.csv(kelp, file = "data/processed data/manipulated data/kelp.csv")
+write.csv(urch_behavior, file = "data/processed data/manipulated data/urch_behavior.csv")
 
 #clear environment
 #rm(list = ls()); gc()

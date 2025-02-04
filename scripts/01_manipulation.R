@@ -20,7 +20,9 @@ pyc_position <- behavior_clean %>%
     Pyc_position = ifelse(Treatment == "Active", 
                           (Pyc_position = Cline[Pyc_position == 1]), 
                           5.5)) %>%
-  na.omit()
+  na.omit()  #some NAs from when didn't record behavioral data (only NA for active bc position for caged/control is known)
+
+
 
 #on per trial scale
 avg_pyc_position <- pyc_position %>%
@@ -48,6 +50,9 @@ avg_dist_from_pyc <- pyc_position %>%
 #interval, pyc could've moved way more. so we also  use % time active, which is, 
 #if pyc moved from one time point to the next, it gets an "active" tally. the 
 #percentage activity is calculated as sum(active)/num time point intervals * 100
+
+#before I thought there was a prob bc i wasn't seeing enough trial 10s - but only did
+#caged/control in trial 10
 
 pyc_activity <- pyc_position %>%
   #getting rid of cline rows (don't need that anymore) - want at day_num scale
@@ -85,7 +90,7 @@ kelp <- kelp_clean %>%
   #adding columns for avg pyc position, distance from pyc, and pyc activity
   merge(avg_pyc_position, by = c("Treatment", "Trial", "Rep_per_trial")) %>%
   merge(avg_dist_from_pyc, by = c("Treatment", "Trial","Rep_per_trial")) %>%
-  merge(pyc_pcnt_activity, by = c("Treatment", "Trial","Rep_per_trial")) %>%
+  merge(pyc_pcnt_activity, by = c("Treatment", "Trial","Rep_per_trial")) %>% #problem
   mutate(#difference in kelp weight and pcnt change in kelp weight
     weight_diff = Kelp_weight_before_g - Kelp_weight_after_g,
     weight_pcnt_change = ((Kelp_weight_before_g - Kelp_weight_after_g)/
