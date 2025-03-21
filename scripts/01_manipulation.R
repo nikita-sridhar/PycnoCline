@@ -59,13 +59,31 @@ pyc_activity <- pyc_position %>%
   group_by(Trial, Treatment, Day_numrecord, Rep_per_trial) %>%
   summarise(Pyc_position = mean(Pyc_position)) %>%
   ungroup() %>%
-  #flag movement (active = true/false) when position is different to prev time point position
+
   arrange(Trial,Treatment, Rep_per_trial, Day_numrecord) %>%
   group_by(Trial, Treatment, Rep_per_trial) %>%
-  mutate(Pyc_position_next_time = lead(Pyc_position, 1),
-         pyc_active = ifelse(Pyc_position == Pyc_position_next_time,"N","Y"),
-         Pyc_dist_moved = abs(Pyc_position_next_time - Pyc_position)) %>%
-  ungroup()
+  mutate(Pyc_position_next_time = lead(Pyc_position, 1)) %>%
+  ungroup() %>%
+ 
+  #if treatment is active, calculate distance moved based on difference in position
+  #if treatment is not active (caged or control), distance moved = 0
+  mutate(Pyc_dist_moved = ifelse(Treatment == "Active",
+         abs(Pyc_position_next_time - Pyc_position), 
+         0)) %>%
+
+  #if treatment is active, then call a pyc active if in next time step it moved somewhere
+  #if treatment is not active (caged/control), call pyc active = N
+  mutate(pyc_active = ifelse(Treatment == "Active",
+         ifelse(Pyc_position == Pyc_position_next_time,"N","Y"),
+         "N"))
+  
+ 
+
+
+#For active treatment, determine whether active by pyc position at next time step              
+
+  
+  #making caged and control N for pyc active
 
 pyc_pcnt_activity <- pyc_activity %>%
   filter(!is.na(pyc_active)) %>%
