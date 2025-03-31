@@ -9,8 +9,8 @@ behavior_raw <- read_csv("data/raw data/2023_Pycnocline_RawData - Behavior.csv")
 #clean kelp
 ###########
 kelp_clean <- kelp_raw %>%
-  filter(Trial != "Pilot",
-         Trial != 2) %>%
+  filter(Trial != "Pilot") %>%
+  filter(Trial != 2) %>%
   select(-Observer, -Notes) %>%
   mutate(Trial = as.character(Trial))
 

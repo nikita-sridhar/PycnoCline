@@ -77,8 +77,6 @@ pyc_activity <- pyc_position %>%
          ifelse(Pyc_position == Pyc_position_next_time,"N","Y"),
          "N"))
   
- 
-
 
 #For active treatment, determine whether active by pyc position at next time step              
 
