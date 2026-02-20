@@ -1,8 +1,8 @@
 ###########
 #load files
 ###########
-kelp_raw <- read_csv("data/raw data/2023_Pycnocline_RawData - Kelp.csv")
-behavior_raw <- read_csv("data/raw data/2023_Pycnocline_RawData - Behavior.csv")
+kelp_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Kelp.csv")
+behavior_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Behavior.csv")
 #add urchin roster
 
 ###########
@@ -12,7 +12,7 @@ kelp_clean <- kelp_raw %>%
   filter(Trial != "Pilot") %>%
   filter(Trial != 2) %>%
   select(-Observer, -Notes) %>%
-  mutate(Trial = as.character(Trial))
+  mutate(Trial = as.character(Trial)) 
 
 ###############
 #clean behavior

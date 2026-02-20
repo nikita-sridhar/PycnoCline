@@ -23,6 +23,9 @@ ggplot(kelp_intermediary2, aes(x=weight_pcnt_change))+
   geom_histogram() +
   facet_wrap(vars(Treatment))
 
+ggplot(kelp, aes(x = weight_pcnt_change)) +
+  geom_histogram() +
+  facet_wrap(vars(Treatment))
 
 ###########################################
 #OLD SCRIPT FOR PLOTS BASED ON JMP OUTPUT
@@ -65,4 +68,5 @@ ggplot(data = kelp_down, aes(x = distance, y = Kelp_grazed_pcntchange, color=Tre
   scale_color_manual(values = c("#f15b12", "#90a8c9", "#662267")) +
   ylab("% Change Kelp Grazed") +
   xlab("Distance from cage (# clines)")
+
 

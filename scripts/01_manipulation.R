@@ -6,6 +6,8 @@
 #behavior_clean <- read_csv("data/processed data/cleaned data/behavior_clean.csv")
 #add urchin roster
 
+#note: on 11/11/25, changed the variable "up_down" to Position, the value "Up" to "Upstream",
+#and the value "Down" to "Downstream".
 #################################
 #find avg pyc position in a trial
 #################################
@@ -112,13 +114,18 @@ kelp <- kelp_clean %>%
     weight_pcnt_change = ((Kelp_weight_before_g - Kelp_weight_after_g)/
                             Kelp_weight_before_g)*100,
     #kelp blade's upstream/downstream position relative to pycno
-    up_down = ifelse(Kelp_ID < avg_pyc_position,"Up","Down")) %>%
+    Position = ifelse(Kelp_ID < avg_pyc_position,"Upstream","Downstream")) %>%
   #up_down ratio calculation
   group_by(Trial, Treatment, Rep_per_trial) %>%
-  mutate(up_down_ratio = sum(up_down=="Up")/sum(up_down=="Down")) %>%
+  mutate(up_down_ratio = sum(Position=="Upstream")/sum(Position=="Downstream")) %>%
   ungroup() %>%
-#making trial and rep_per_trial character
-  mutate(across(c(Trial, Rep_per_trial), as.character))
+#making trial and rep_per_trial character and treatment a factor
+  mutate(across(c(Trial, Rep_per_trial), as.character)) %>%
+  mutate(across(c(Treatment, Position), as.factor)) %>%
+#making a col for converting neg values to pos (for model)
+  mutate(pos_weight_pcnt_change = ifelse(weight_pcnt_change <= 0, 0.00001, weight_pcnt_change)) %>%
+  mutate(pos_weight_diff = ifelse(weight_diff <= 0, 0.00001, weight_diff))
+  
 
 #can add urchin roster info if you want:
 #left_join(urch_size,by = c("Trial","Tank")) %>%
@@ -138,16 +145,16 @@ urch_behavior <- behavior_clean %>%
   merge(pyc_pcnt_activity, by = c("Treatment", "Trial", "Rep_per_trial")) %>%
   
   mutate(#upstream/downstream position relative to pycno
-    up_down = ifelse(Cline < avg_pyc_position,"Up","Down")) %>%
+    Position = ifelse(Cline < avg_pyc_position,"Upstream","Downstream")) %>%
   #up_down ratio calculation
   group_by(Trial, Treatment, Rep_per_trial) %>%
-  mutate(up_down_ratio = sum(up_down=="Up")/sum(up_down=="Down")) %>%
-  ungroup() #%>%
+  mutate(up_down_ratio = sum(Position=="Upstream")/sum(Position=="Downstream")) %>%
+  ungroup() %>%
+
+  distinct(Day_numrecord, Treatment, Trial, Rep_per_trial, Cline, Cline_seg, .keep_all = TRUE)
 #adding urchin roster info
 #left_join(urch_size,by = c("Trial","Tank")) %>%
 
 
 
-#TO DO: investigate why kelp variable doesn't have
-#i think there's some prob in manipualtion -- bc no trial 10 in manipulated kelp. and model results
-#are v difff to JMP - nothin significant now -- need to investigate
+

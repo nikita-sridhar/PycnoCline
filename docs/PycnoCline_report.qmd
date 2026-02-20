@@ -1,0 +1,400 @@
+---
+title: "PycnoCline"
+format: 
+  html:
+    code-fold: true
+    page-layout: full
+editor: visual
+date: last-modified
+---
+
+**Note: Run \_\_main.R first**
+
+```{r}
+source(here::here("./__main.R"))
+```
+
+```{r}
+#default formatting for all tables in this report
+set_flextable_defaults(
+  font.size = 11, font.family = "Arial",
+  font.color = "#333333",
+  table.layout = "fixed",
+  border.color = "gray",
+  padding.top = 3, padding.bottom = 3,
+  padding.left = 4, padding.right = 4)
+
+```
+
+## **Kelp**
+
+**Building models + contrasts:**
+
+```{r}
+
+#releveling reference groups 
+kelp$Treatment <- relevel(kelp$Treatment, ref = "Control")
+kelp$Position <- relevel(kelp$Position, ref = "Upstream")
+
+
+#investigating distributions 
+ggplot(kelp, aes(x = weight_diff)) +
+  geom_density() +
+  facet_wrap(vars(Treatment))
+
+#test for normality
+qqPlot(kelp$weight_diff)
+
+
+#linear model
+model <- lm(weight_diff ~ 
+                  
+                  Treatment + Position + Treatment*Position,  
+                
+                data = kelp)
+
+summary(model)
+
+
+anova(model) %>%
+  data.frame() %>%
+  as_tibble(rownames = " ", colnames = " ") %>%
+  mutate(Pr..F. = ifelse(Pr..F. < 0.0001, "< 0.0001",
+                          round(Pr..F., 3))) %>% 
+  
+  flextable() %>%
+  #header formatting
+  set_header_labels(Df = 'd.f.',
+                    Sum.Sq = "sum sq",
+                    Mean.Sq = "mean sq",
+                    F.value = "f-value",
+                    Pr..F. = "p-value") %>%
+  bold(i = 1, part = "header") %>%
+  align(align = 'center', part = 'header') %>%
+  #body formatting
+  colformat_double(j = c(2:6), digits = 3) %>%
+  bold(~Pr..F. < 0.05, j = "Pr..F.") %>%
+  vline_left() %>%
+  vline_right() %>%
+  
+  autofit()  
+                      
+```
+
+**Post-hoc tests**
+
+```{r}
+#estimated marginal means
+EMM <- emmeans(model, ~ Treatment + Position + Treatment*Position)
+
+#weighted contrasts for specific factor groupings
+contrast_weights <- list(
+  CagedDown_CagedUp = c(control_upstream = 0,
+                    active_upstream = 0,
+                    caged_upstream = -1,
+                    control_downstream = 0,
+                    active_downstream = 0,
+                    caged_downstream = 1),
+  
+  ActiveDown_ActiveUp = c(control_upstream = 0,
+                   active_upstream = -1,
+                   caged_upstream = 0,
+                   control_downstream = 0,
+                   active_downstream = 1,
+                   caged_downstream = 0),
+  
+  ControlDown_ControlUp = c(control_upstream = -1,
+                     active_upstream = 0,
+                     caged_upstream = 0,
+                     control_downstream = 1,
+                     active_downstream = 0,
+                     caged_downstream = 0),
+  
+  CagedUp_ControlUpDn = c(control_upstream = -0.5,
+                          active_upstream = 0,
+                          caged_upstream = 1,
+                          control_downstream = -0.5,
+                          active_downstream = 0,
+                          caged_downstream = 0),
+  
+  CagedDown_ControlUpDown = c(control_upstream = -0.5,
+                        active_upstream = 0,
+                        caged_upstream = 0,
+                        control_downstream = -0.5,
+                        active_downstream = 0,
+                        caged_downstream = 1),
+  
+  CagedUp_ActiveUpDown = c(control_upstream = 0,
+                            active_upstream = -0.5,
+                            caged_upstream = 1,
+                            control_downstream = 0,
+                            active_downstream = -0.5,
+                            caged_downstream = 0),
+  
+  CagedDown_ActiveUpDown = c(control_upstream = 0,
+                            active_upstream = -0.5,
+                            caged_upstream = 0,
+                            control_downstream = 0,
+                            active_downstream = -0.5,
+                            caged_downstream = 1),
+  
+  ControlUpDown_ActiveUpDown = c(control_upstream = 0.5,
+                            active_upstream = -0.5,
+                            caged_upstream = 0,
+                            control_downstream = 0.5,
+                            active_downstream = -0.5,
+                            caged_downstream = 0),
+  
+  ControlUpDown_CagedUpDown = c(control_upstream = 0.5,
+                            active_upstream = 0,
+                            caged_upstream = -0.5,
+                            control_downstream = 0.5,
+                            active_downstream = 0,
+                            caged_downstream = -0.5)
+  ,
+  ActiveUpDown_CagedUpDown = c(control_upstream = 0,
+                            active_upstream = 0.5,
+                            caged_upstream = -0.5,
+                            control_downstream = 0,
+                            active_downstream = 0.5,
+                            caged_downstream = -0.5)
+  
+)
+
+#pairwise contrasts and formatting of table
+mod_contrasts <- contrast(EMM, contrast_weights) %>%
+
+  data.frame() %>%   
+  mutate(p.value = ifelse(p.value < 0.0001, "< 0.0001",
+                          round(p.value,3))) %>% 
+  
+  #adding contrast column to name contrasts
+  mutate("contrast" = c("a) Caged Down vs. Caged Up",
+                        "b) Active Down vs. Active Up",
+                        "c) Control Down vs. Control Up",
+                        "d) Caged Up vs. Control", 
+                        "e) Caged Down vs. Control", 
+                        "f) Caged Up vs. Active", 
+                        "g) Caged Down vs. Active",
+                        "h) Control vs. Active",
+                        "i) Control vs. Caged",
+                        "j) Active vs. Caged"),
+    #adding col of hypotheses
+        "Hypothesis" = c("Urchins downstream of a caged star will graze less than urchins upstream", 
+                         "Urchins will graze uniformly around the tank", 
+                         "Urchins will graze uniformly around the tank",
+                         "Urchins upstream of a caged star will graze similarly to urchins in the control",
+                         "Urchins downstream of a caged star will graze less than urchins in the control",
+                         "Urchins upstream of a caged star will graze more than urchins around an active star",
+                         "Urchins downstream of a caged star will graze more or similarly to urchins around an active star",
+                         "Urchins in the control will graze more than urchins around an active star",
+                         "Urchins in the control will graze more than urchins around a caged star",
+                         "Urchins around an active star will graze less than or the same as urchins around a caged star"),.after = "contrast",
+  #adding column to show weights per treatment combo for each contrast      
+         "caged up" = c(-1,0,0,1,0,1,0,0,-0.5,-0.5), 
+         "caged down" = c(1,0,0,0,1,0,1,0,-0.5,0), 
+         "control up" = c(0,0,-1,-0.5,-0.5,0,0,0.5,0.5,0), 
+         "control down" = c(0,0,1,-0.5,-0.5,0,0,0.5,0.5,0), 
+         "active up" = c(0,-1,0,0,0,-0.5,-0.5,-0.5,0,0.5), 
+         "active down" = c(0,1,0,0,0,-0.5,-0.5,-0.5,0,0.5))
+
+  
+
+
+
+#flextable formatting of above dataframe
+ft <- flextable(mod_contrasts)  %>%  
+  
+  #header formatting
+  set_header_labels(contrast = 'Contrast',
+                    emmean = 'Estimate',
+                    SE = 's.e.',
+                    df = 'd.f.',
+                    t.ratio = "t-ratio",
+                    p.value = "p-value") %>%
+  italic(part = "all", j = 1) %>%
+  bold(part = "header") %>%
+  
+  #subheader formatting  
+  add_header_row(top = TRUE, values = c("","contrast weights",""), #subheader
+                   colwidths = c(2,6,5)) %>%
+  align(align = "center", part = "all") %>% 
+  italic(part = "header", i = 1) %>%
+  hline(i = 1, border = officer::fp_border(width = 0), part = "header") %>%
+  
+  #body formatting
+  #change size of hypothesis column 
+  fontsize(j = 2, size = 8, part = "body") %>%
+  colformat_double(j = c(9:13), digits = 2) %>% #setting number of decimal places
+  bold(~p.value < 0.05, j = "p.value") %>% #make significant p values bold
+  color(j = c(2:8), color = "#6a6767", part = "all") %>% 
+  
+  #color for contrast weights
+  vline( j = c("contrast", "active down"), border = fp_border_default(), part = "all") %>%
+  vline_left() %>%
+  vline_right() %>%
+  
+  #color in cells above 0 for weights
+  bg(i = 1, j = c(3,4), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 2, j = c(7,8), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 3, j = c(5,6), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 4, j = c(3,5,6), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 5, j = c(4,5,6), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 6, j = c(3,7,8), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 7, j = c(4,7,8), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 8, j = c(5,6,7,8), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 9, j = c(3,5,6,8), part = "body", bg = "#F5F5F5") %>%
+  bg(i = 10, j = c(4,5,7,8), part = "body", bg = "#F5F5F5") %>%
+
+  
+autofit()  
+
+
+
+ft
+```
+
+**Plotting results:**
+
+fulltank / updn
+
+```{r}
+
+#reordering variables to show up on x axis
+avg_kelp_wholetank$Treatment <- factor(avg_kelp_wholetank$Treatment, 
+                                       levels=c('Control', 'Caged', 'Active'))
+avg_kelp_updn$Treatment <- factor(avg_kelp_updn$Treatment, 
+                                       levels=c('Control', 'Caged', 'Active'))
+avg_kelp_updn$Position <- factor(avg_kelp_updn$Position, levels=c('Upstream', 'Downstream'))
+
+#for up/dn graph, adding identifier var of treatment_updn to color individual bars eventually
+avg_kelp_updn$unique_treatment <- paste(avg_kelp_updn$Treatment, 
+                                        avg_kelp_updn$Position, sep = "_")
+avg_kelp_updn$unique_treatment <- as.factor(avg_kelp_updn$unique_treatment)
+avg_kelp_updn$unique_treatment <- factor(avg_kelp_updn$unique_treatment, 
+                                         levels=c('Control_Upstream','Control_Downstream',
+                                                  'Caged_Upstream','Caged_Downstream',
+                                                  'Active_Upstream','Active_Downstream'))
+
+
+library(ggplot2)
+library(ggpubr) # for geom_bracket
+
+#----------------------------
+# Full Tank Plot
+#----------------------------
+fulltank <- 
+  ggplot(avg_kelp_wholetank, aes(x = Treatment, y = avg_weight_diff, fill = Treatment)) +
+  
+  geom_col(position = position_dodge(width = 0.9)) +
+  
+  geom_errorbar(aes(ymin = avg_weight_diff - se_weight_diff,
+                    ymax = avg_weight_diff + se_weight_diff),
+                position = position_dodge(width = 0.9),
+                width = 0.1) +
+  
+  # Significance: Active vs Caged
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 2,  # caged
+    xmax = 3,  # active
+    y.position = max(avg_kelp_wholetank$avg_weight_diff + avg_kelp_wholetank$se_weight_diff) + 0.5,
+    label = "**",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  # Significance: Control vs Active
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 1,  # control
+    xmax = 3,  # active
+    y.position = max(avg_kelp_wholetank$avg_weight_diff + avg_kelp_wholetank$se_weight_diff) + 1.2,
+    label = "*",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  labs(title = "Kelp grazed across the entire tank\n",
+       x = "Predator treatment",
+       fill = "Predator treatment") +
+  
+  scale_fill_manual(values = c('#5A5A5A','#b3cde0', "#fcbba1")) +
+  theme_classic()
+
+
+#----------------------------
+# Upstream/Downstream Plot
+#----------------------------
+dw <- 0.9 # dodge width
+off <- dw / 4
+
+updn <- 
+  ggplot(avg_kelp_updn, aes(x = Treatment, y = updn_avg_weight_diff, fill = unique_treatment)) +
+  
+  geom_col(position = position_dodge(width = dw)) +
+  
+  geom_errorbar(aes(ymin = updn_avg_weight_diff - updn_se_weight_diff,
+                    ymax = updn_avg_weight_diff + updn_se_weight_diff),
+                position = position_dodge(width = dw),
+                width = 0.1) +
+  
+  # 1) Caged Up vs Caged Down
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 2 - off,  # caged up
+    xmax = 2 + off,  # caged down
+    y.position = 8.0,
+    label = "***",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  # 2) Caged Up vs Control
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 1,  # control 
+    xmax = 2 - off,  # caged up
+    y.position = 8.7,
+    label = "*",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  # 3) Caged Down vs Control
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 1,  # control 
+    xmax = 2 + off,  # caged down
+    y.position = 9.4,
+    label = "*",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  # 4) Caged Up vs Active
+  geom_bracket(
+    inherit.aes = FALSE,
+    xmin = 2 - off,  # caged up
+    xmax = 3,        # active
+    y.position = 10.1,
+    label = "***",
+    color = "grey40", alpha = 0.7, size = 0.5, vjust = 0.5
+  ) +
+  
+  labs(x = "Predator treatment",
+       y = " ",
+       fill = "Predator Treatment and \nposition relative to cage",
+       title = "Kelp grazed across tank segments\n",
+       caption = "* p < 0.05, ** p < 0.01, *** p < 0.0001 ") +
+  
+  
+  scale_fill_manual(
+    labels = c("Control upstream","Control downstream","Caged upstream","Caged downstream","Active upstream","Active downstream"),
+    values = c('#5A5A5A','#D3D3D3','#005b96','#b3cde0','#9d5600','#fcbba1')
+  ) +
+  
+  theme_classic() +
+  theme(plot.caption = element_text(color = "grey40", hjust = 1.9))
+
+
+# Combine plots
+fulltank / updn
+
+
+```
