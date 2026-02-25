@@ -9,13 +9,13 @@ urch_bhvr_tank <- urch_behavior %>%
   summarise(tank_total_urchin = sum(TOTAL_clinesegURCH, na.rm = TRUE),
             #num urchins on kelp (grazing and/or touching kelp)
             tank_total_onkelp = sum(urch_GRAZE + urch_TOUCHKELP),
-            pcnt_onkelp = (tank_total_onkelp/tank_total_urchin)*100,
+            pcnt_onkelp = (tank_total_onkelp/tank_total_urchin),
             #num urchins moving)
             tank_total_moving = sum(Urch_MOVING),
-            pcnt_moving = (tank_total_moving/tank_total_urchin)*100,
+            pcnt_moving = (tank_total_moving/tank_total_urchin),
             #num urchins in a crevice)
             tank_total_crev = sum(urch_CREVICE),
-            pcnt_crev = (tank_total_crev/tank_total_urchin)*100) 
+            pcnt_crev = (tank_total_crev/tank_total_urchin)) 
 
 urch_bhvr_trial <- urch_bhvr_tank %>%
   group_by(Treatment, Trial) %>%
@@ -96,8 +96,10 @@ fulltank <- ggplot(urch_bhvr_treatment_long, aes(x = Treatment, y = mean)) +
   labs(y = "Mean % of urchins displaying behavior",
        caption = "Error bars represent mean +/- 1 SD",
        title = "Sea urchin behaviors across the entire tank") +
+
+  scale_y_continuous(expand = expansion(mult = c(0.1, 0.3), add = c(0, 1)))  +
   
-  theme_bw()
+  theme_test()
 
 #plotting same as above but - UP/DN regions ------------------------------------
 dw <- 0.9 # dodge width
@@ -122,14 +124,16 @@ updn <- ggplot(urch_bhvr_treatment_updn_long, aes(x = Treatment, y = mean, fill 
        fill = "Position relative to cage",
        title = "Sea urchin behaviors across tank segments") +
   
-  theme_bw()
+  theme_test()
 
 fulltank / updn
 
 
-#now trying models ###############################################################
-#need to try this including adding pycno movement as a fixed effect
-ggplot(urch_bhvr_tank, aes(x = pcnt_onkelp)) + #right skew - use gamma 
+#############################################################################
+#MODELS
+#############################################################################
+
+ggplot(urch_bhvr_tank, aes(x = pcnt_onkelp)) +  
   geom_density() +
   facet_wrap(vars(Treatment)) 
 
@@ -139,15 +143,15 @@ urch_bhvr_tank_forgamma <- urch_bhvr_tank %>%
          pcnt_onkelp = ifelse(pcnt_onkelp <= 0, 0.0001, pcnt_onkelp))
 
 crev_model <- glmmTMB(pcnt_crev ~ 
-                        Treatment + Position + Treatment*Position + (1|Trial),  
-                      data = urch_bhvr_tank_forgamma,
-                      family = Gamma(link = "log")) #nothing sig
+                        Treatment + (1|Trial),  #tank trial nest
+                      data = urch_bhvr_tank,
+                      family = beta_family()) #nothing sig
 moving_model <- glmmTMB(pcnt_moving ~ 
-                          Treatment + Position + Treatment*Position + (1|Trial),  
+                          Treatment + (1|Trial),  
                         data = urch_bhvr_tank_forgamma,
                         family = Gamma(link = "log")) #treatment is sig
-onkelp_model <- lm(pcnt_moving ~ 
-                     Treatment + Position + Treatment*Position,  
+onkelp_model <- lmer(pcnt_onkelp ~ 
+                     Treatment + (1|Trial),  
                    data = urch_bhvr_tank) #treatment is sig
 
 car::Anova(crev_model)
@@ -203,5 +207,18 @@ car::Anova(onkelp_model) %>%
   autofit()                                          
 
 
+#############################################################################
+#POST HOC TEST
+#############################################################################
+
+#for all behaviors, interaction term not signif (nly treatment), so do contrasts at the scale of just treatment
+
+EMM_crev <- emmeans(crev_model, ~ Treatment)
+EMM_moving <- emmeans(moving_model, ~ Treatment)
+EMM_onkelp <- emmeans(onkelp_model, ~ Treatment)
+
+pairs(EMM_crev)
+pairs(EMM_moving)
+pairs(EMM_onkelp)
 
 

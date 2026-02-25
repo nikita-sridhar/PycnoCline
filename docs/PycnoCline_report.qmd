@@ -53,6 +53,12 @@ model <- lm(weight_diff ~
                 
                 data = kelp)
 
+model <- lmer(weight_diff ~ 
+                  
+                  Treatment + Position + Treatment*Position + (1|Trial/Tank),  
+                
+                data = kelp)
+
 summary(model)
 
 
@@ -227,10 +233,10 @@ ft <- flextable(mod_contrasts)  %>%
   fontsize(j = 2, size = 8, part = "body") %>%
   colformat_double(j = c(9:13), digits = 2) %>% #setting number of decimal places
   bold(~p.value < 0.05, j = "p.value") %>% #make significant p values bold
-  color(j = c(2:8), color = "#6a6767", part = "all") %>% 
+  color(j = c(3:8), color = "#6a6767", part = "all") %>% 
   
   #color for contrast weights
-  vline( j = c("contrast", "active down"), border = fp_border_default(), part = "all") %>%
+  vline( j = c("Hypothesis", "active down"), border = fp_border_default(), part = "all") %>%
   vline_left() %>%
   vline_right() %>%
   
