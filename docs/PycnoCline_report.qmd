@@ -11,7 +11,7 @@ date: last-modified
 **Note: Run \_\_main.R first**
 
 ```{r}
-source(here::here("./__main.R"))
+
 ```
 
 ```{r}
@@ -46,12 +46,7 @@ ggplot(kelp, aes(x = weight_diff)) +
 qqPlot(kelp$weight_diff)
 
 
-#linear model
-model <- lm(weight_diff ~ 
-                  
-                  Treatment + Position + Treatment*Position,  
-                
-                data = kelp)
+#linear mixed effects model
 
 model <- lmer(weight_diff ~ 
                   
