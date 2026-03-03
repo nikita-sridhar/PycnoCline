@@ -1,8 +1,4 @@
-###########
-#load files
-###########
-kelp_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Kelp.csv")
-behavior_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Behavior.csv")
+
 
 ###########
 #clean kelp

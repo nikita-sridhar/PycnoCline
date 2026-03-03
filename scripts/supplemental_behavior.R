@@ -1,6 +1,7 @@
 #PYCNOCLINE behavior ###########################################################
 
-#touching kelp, in a crevice, : of all urchins in a tank for each time a recording was made (day_numrecord)
+#touching kelp, in a crevice, moving: % of all urchins in a tank for each time a 
+#recording was made (day_numrecord)
 
 urch_bhvr_tank <- urch_behavior %>%
   group_by(Day_numrecord, Treatment, Trial, Rep_per_trial, Position) %>%
@@ -66,7 +67,7 @@ urch_bhvr_tank_forbeta <- urch_bhvr_tank %>%
          pcnt_onkelp = case_when(pcnt_onkelp == 0 ~ 0.0001,
                                  pcnt_onkelp >= 1 ~ 0.9999))
 
-#note: tried beta, didn't run (convergence issues). removed position
+#note: tried beta, didn't run (convergence issues). 
 crev_model <- glmmTMB(pcnt_crev ~ 
                       Treatment + Position + Treatment*Position + (1|Trial),  
                       data = urch_bhvr_tank_forgamma,

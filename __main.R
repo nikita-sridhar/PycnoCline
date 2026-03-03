@@ -1,10 +1,13 @@
-#PYCNOCLINE
+#PYCNOCLINE - EXPERIMENT 1
+#Authored by: Nikita Sridhar
 
-#Run full analysis pipeline
+#This script loads libraries, cleans and manipulates data required for analyses.
+
+#load libraries
 library(tidyverse)
 library(lme4)
 library(lmerTest)
-library(sjstats) #for p value
+library(sjstats) 
 library(ggeffects)
 library(emmeans)
 library(glmmTMB)
@@ -20,16 +23,18 @@ library(ggpubr)
 library(grid)
 library(gridExtra)
 library(RColorBrewer)
+library(ggplot2)
+
+
+#load files
+kelp_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Kelp.csv")
+behavior_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Behavior.csv")
 
 
 #Step 0 - Clean raw data
 source(here::here("./scripts/00_cleaning.R"))
 #Step 1 - Manipulate cleaned data to get ready for stats
 source(here::here("./scripts/01_manipulation.R"))
-#Step 2 - Analyze data
-source(here::here("./scripts/02_analysis.R"))
-#Step 3 - Plot data
-#source(here::here("./scripts/03_make_plots.R"))
 
 
 #Save files

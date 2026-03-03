@@ -11,10 +11,6 @@ date: last-modified
 **Note: Run \_\_main.R first**
 
 ```{r}
-
-```
-
-```{r}
 #default formatting for all tables in this report
 set_flextable_defaults(
   font.size = 11, font.family = "Arial",
@@ -278,12 +274,11 @@ avg_kelp_updn$unique_treatment <- factor(avg_kelp_updn$unique_treatment,
                                                   'Active_Upstream','Active_Downstream'))
 
 
-library(ggplot2)
-library(ggpubr) # for geom_bracket
 
-#----------------------------
+
+############################
 # Full Tank Plot
-#----------------------------
+############################
 fulltank <- 
   ggplot(avg_kelp_wholetank, aes(x = Treatment, y = avg_weight_diff, fill = Treatment)) +
   
@@ -322,9 +317,9 @@ fulltank <-
   theme_classic()
 
 
-#----------------------------
+############################
 # Upstream/Downstream Plot
-#----------------------------
+############################
 dw <- 0.9 # dodge width
 off <- dw / 4
 
