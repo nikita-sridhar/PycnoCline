@@ -1,7 +1,3 @@
----
-title: Experiment 1: PycnoCline
----
-
 # Experiment 1 : PycnoCline 
 
 ### Authored by: Nikita Sridhar
