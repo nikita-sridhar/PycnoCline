@@ -14,4 +14,4 @@ Outline of files and their respective functions:
 | scripts/supplemental_behavior.R | All analysis of urchin behavior data including manipulation, building models, post-hoc tests, and plotting graphs. Tables and graphs included in supplemental section of MS. |
 | scripts/supplemental_sizes.R | Calculation of average organism sizes used per treatment. Table included in supplemental section of MS. |
 
-Output of PycnoCline report can be found [here](PycnoCline_report.html).
+Output of PycnoCline report can be found [here](https://nikita-sridhar.github.io/PycnoCline/PycnoCline_report.html).
