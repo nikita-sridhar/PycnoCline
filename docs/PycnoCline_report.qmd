@@ -6,11 +6,27 @@ format:
     page-layout: full
 editor: visual
 date: last-modified
+execute-dir: project
+message: false
 ---
 
-**Note: Run \_\_main.R first**
+**Analysis of urchin grazing data for PycnoCline experiment on sunflower star indirect effects on kelp conducted in Sitka, AK in summer of 2023.**
 
 ```{r}
+#| echo: false
+#| warning: false
+
+library(here)
+source(here::here("__main.R"))
+
+#load files
+kelp_raw <- read_csv(here::here("./data/raw/2023_Pycnocline_RawData - Kelp.csv"))
+behavior_raw <- read_csv(here::here("data/raw/2023_Pycnocline_RawData - Behavior.csv"))
+```
+
+```{r}
+#| echo: false
+
 #default formatting for all tables in this report
 set_flextable_defaults(
   font.size = 11, font.family = "Arial",
@@ -26,21 +42,30 @@ set_flextable_defaults(
 
 **Building models + contrasts:**
 
+Investigating distribution of response variable (change in kelp weight) to determine which model to use, and testing for normality.
+
 ```{r}
+#| results: hide
+
 
 #releveling reference groups 
 kelp$Treatment <- relevel(kelp$Treatment, ref = "Control")
 kelp$Position <- relevel(kelp$Position, ref = "Upstream")
 
-
 #investigating distributions 
 ggplot(kelp, aes(x = weight_diff)) +
   geom_density() +
-  facet_wrap(vars(Treatment))
+  facet_wrap(vars(Treatment)) +
+  theme_bw()
 
 #test for normality
 qqPlot(kelp$weight_diff)
 
+```
+
+Linear mixed-effects model for difference in kelp weight
+
+```{r}
 
 #linear mixed effects model
 
@@ -49,8 +74,6 @@ model <- lmer(weight_diff ~
                   Treatment + Position + Treatment*Position + (1|Trial/Tank),  
                 
                 data = kelp)
-
-summary(model)
 
 
 anova(model) %>%
@@ -79,6 +102,8 @@ anova(model) %>%
 ```
 
 **Post-hoc tests**
+
+Calculating estimated marginal means from the linear mixed-effects model, and calculating pairwise contrasts based on a priori hypotheses using custom contrast weights.
 
 ```{r}
 #estimated marginal means
@@ -196,9 +221,6 @@ mod_contrasts <- contrast(EMM, contrast_weights) %>%
          "active down" = c(0,1,0,0,0,-0.5,-0.5,-0.5,0,0.5))
 
   
-
-
-
 #flextable formatting of above dataframe
 ft <- flextable(mod_contrasts)  %>%  
   
@@ -253,9 +275,8 @@ ft
 
 **Plotting results:**
 
-fulltank / updn
-
 ```{r}
+#| echo: false
 
 #reordering variables to show up on x axis
 avg_kelp_wholetank$Treatment <- factor(avg_kelp_wholetank$Treatment, 
@@ -272,9 +293,11 @@ avg_kelp_updn$unique_treatment <- factor(avg_kelp_updn$unique_treatment,
                                          levels=c('Control_Upstream','Control_Downstream',
                                                   'Caged_Upstream','Caged_Downstream',
                                                   'Active_Upstream','Active_Downstream'))
+```
 
+Bar chart of raw data showing change in kelp weight across treatments, with significance bars manually added based on significant pairwise contrasts.
 
-
+```{r}
 
 ############################
 # Full Tank Plot

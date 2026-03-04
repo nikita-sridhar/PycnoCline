@@ -27,8 +27,8 @@ library(ggplot2)
 
 
 #load files
-kelp_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Kelp.csv")
-behavior_raw <- read_csv("data/raw/2023_Pycnocline_RawData - Behavior.csv")
+kelp_raw <- read_csv(here::here("./data/raw/2023_Pycnocline_RawData - Kelp.csv"))
+behavior_raw <- read_csv(here::here("data/raw/2023_Pycnocline_RawData - Behavior.csv"))
 
 
 #Step 0 - Clean raw data
