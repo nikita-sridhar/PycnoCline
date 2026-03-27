@@ -10,7 +10,7 @@ set_flextable_defaults(
 
 
 #trial info w some formatting
-trial_info <- read_csv("data/raw/2023_Pycnocline_RawData - Trial.csv") %>%
+trial_info <- read_csv("data/raw/exp2_trial_info.csv") %>%
   rename(Tank = Tank_num) %>%
   mutate(Rep_per_trial = case_when(grepl("1", Treatment) ~ 1,
                                    grepl("2", Treatment) ~ 2, TRUE ~ 1), .after = Trial,
@@ -22,7 +22,7 @@ trial_info <- read_csv("data/raw/2023_Pycnocline_RawData - Trial.csv") %>%
 
 
 #making a table of average urchin sizes in Pycnolcine experiment
-urch_roster <-  read_csv("data/raw/2023_Pycnocline_RawData - Urchin Roster.csv")
+urch_roster <-  read_csv("data/raw/exp1_urchin_roster.csv")
 
 urch_size <- urch_roster %>%
   left_join(trial_info, by = c("Tank", "Trial")) %>%
@@ -50,7 +50,7 @@ flextable(urch_size) %>%
 
 
 #average pycno sizes
-pycno_roster <- read_csv("data/raw/2023_Pycnocline_RawData - Pycno Roster.csv") %>%
+pycno_roster <- read_csv("data/raw/exp1_pycno_roster.csv") %>%
   mutate(Rep_per_trial = case_when(grepl("1", Treatment) ~ 1,
                                    grepl("2", Treatment) ~ 2, TRUE ~ 1), .after = Trial,
          Treatment = case_when(grepl("Active", Treatment) ~ "Active",
