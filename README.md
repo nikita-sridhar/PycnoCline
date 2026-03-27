@@ -4,14 +4,17 @@
 
 *Data and analysis for PycnoCline, an experiment on the effect of sunflower stars on urchin grazing of kelp with different sea star activity levels that was run in the summer of 2023 in Sitka, AK. Using R Version 2026.01.1+403 (2026.01.1+403)*
 
-Outline of files and their respective functions:
+Data is available in supplemental. Download repository, and make a folder called "data", save the data to this folder.
+
+Outline of main files and their respective functions:
 
 | File structure | Description |
 |-------------------------|-----------------------------------------------|
-| \_\_main.R | Loads libraries and data, runs cleaning and manipulation scripts required for future scripts/reports. |
+| \_\_main.R | Loads libraries and data, runs cleaning and manipulation scripts. **Run this before any other script or quarto doc** |
 | docs/PycnoCline_report.qmd | Main analysis of kelp data including building models, post-hoc tests, and plotting graphs. |
 | scripts/predation_rate.R | Calculation of *Pycnopodia* predation rates (numbers derived from notes in raw data) |
 | scripts/supplemental_behavior.R | All analysis of urchin behavior data including manipulation, building models, post-hoc tests, and plotting graphs. Tables and graphs included in supplemental section of MS. |
 | scripts/supplemental_sizes.R | Calculation of average organism sizes used per treatment. Table included in supplemental section of MS. |
+
 
 Output of PycnoCline report can be found [here](https://nikita-sridhar.github.io/PycnoCline/PycnoCline_report.html).
