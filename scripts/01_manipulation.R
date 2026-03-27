@@ -64,14 +64,5 @@ avg_kelp_updn <- kelp %>%
          updn_se_weight_diff = sd(weight_diff)/sqrt(length(weight_diff))) %>%
   distinct(Treatment, updn_avg_weight_diff, updn_sd_weight_diff, updn_se_weight_diff)
 
-#calculating sample size for raw data
-#whole experiment:
-kelp %>%  summarize(count = n())
-
-#whole tank:
-kelp %>% group_by(Treatment) %>% summarize(count = n())
-
-#up/dn segments
-kelp %>% group_by(Treatment, Position) %>% summarize(count = n())
 
 

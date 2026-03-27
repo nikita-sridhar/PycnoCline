@@ -10,7 +10,7 @@ execute-dir: project
 message: false
 ---
 
-**Analysis of urchin grazing data for PycnoCline experiment on sunflower star indirect effects on kelp under different sea star activity levels conducted in Sitka, AK in summer of 2023.**
+**Analysis of urchin grazing data for PycnoCline experiment on sunflower star indirect effects on kelp conducted in Sitka, AK in summer of 2023.**
 
 ```{r}
 #| echo: false
