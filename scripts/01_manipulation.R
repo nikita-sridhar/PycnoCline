@@ -1,9 +1,4 @@
-############
-#load files 
-############
-#should already be loaded if you ran  00_cleaning first
-#kelp_clean <- read_csv("data/processed data/cleaned data/kelp_clean.csv")
-#behavior_clean <- read_csv("data/processed data/cleaned data/behavior_clean.csv")
+
 
 
 ###########################################
