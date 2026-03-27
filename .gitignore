@@ -5,4 +5,7 @@
 .DS_Store
 .quarto
 data
+<<<<<<< HEAD
 git_data
+=======
+>>>>>>> 95ff289df695ccce507efdb18d3e5b5fffdc7313
